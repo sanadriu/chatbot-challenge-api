@@ -1,0 +1,26 @@
+[
+	{
+		"name": "demo",
+		"sequence": [
+			{
+				"name": "username",
+				"datatype": "text",
+				"questionMsgTemplate": "Hello! What’s your name?",
+				"warningMsgTemplate": "Sorry. I couldn't understand your name. Could you repeat it again?"
+			},
+			{
+				"name": "birthdate",
+				"datatype": "date",
+				"questionMsgTemplate": "Hi, {{username}}! What’s your birthdate?",
+				"warningMsgTemplate": "Ohh, apologies {{username}}, I don’t understand. \n\nCan you please specify your birthdate in YYYY-MM-DD format? \n\nThanks!"
+			},
+			{
+				"name": "plan",
+				"datatype": "options",
+				"options": ["A", "B", "C"],
+				"questionMsgTemplate": "Nice! What insurance plan are you interested in?\n\nA: Basic health insurance.\nB: Full health insurance.\nC: Full health and dental insurance.\n\nPlease answer A, B or C according to your choice.",
+				"warningMsgTemplate": "Sorry, can you please reply A, B or C depending on what insurance plan you wish to purchase? Thanks."
+			}
+		]
+	}
+]

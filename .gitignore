@@ -1,0 +1,4 @@
+.env*
+.stuff
+dist
+node_modules
