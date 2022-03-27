@@ -21,7 +21,7 @@ export const chatReplyBodySchema = object({
 			(value) => typeof value === "string" && validator.isMobilePhone(value, "es-ES")
 		)
 		.label("Phone"),
-	message: string().required().label("Message"),
+	content: string().required().label("Content"),
 });
 
 export const chatParamsSchema = object({

@@ -1,16 +1,18 @@
 import { Schema, Types, model, Model, Document } from "mongoose";
+import { boolean } from "yup";
 
 export interface ClientData {
 	name: string;
 	value: string;
-	status: "valid" | "invalid" | "pending";
+	isValid: boolean;
 }
 
 export interface Client {
 	chat: Types.ObjectId;
 	phone: string;
 	datalist: Array<ClientData>;
-	currentStep: number;
+	isCompleted: boolean;
+	isPending: boolean;
 }
 
 export interface ClientDocument extends Document<unknown, any, Client>, Client {}
@@ -24,10 +26,10 @@ const clientDataSchema = new Schema<ClientData>({
 		type: String,
 		required: true,
 	},
-	// status: {
-	// 	type: String,
-	// 	required: true,
-	// }
+	isValid: {
+		type: Boolean,
+		required: true,
+	},
 });
 
 const clientSchema = new Schema<Client>(
@@ -44,9 +46,13 @@ const clientSchema = new Schema<Client>(
 		datalist: {
 			type: [clientDataSchema],
 		},
-		currentStep: {
-			type: Number,
-			default: 0,
+		isCompleted: {
+			type: Boolean,
+			default: false,
+		},
+		isPending: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	{

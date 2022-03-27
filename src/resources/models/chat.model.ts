@@ -1,24 +1,24 @@
 import { Schema, model, Document } from "mongoose";
 
-export type StepDatatype = "text" | "number" | "integer" | "email" | "date" | "option";
-export type StepOptions = Array<string>;
+export type QuestionDatatype = "text" | "number" | "integer" | "email" | "date" | "option";
+export type QuestionOptions = Array<string>;
 
-export interface ChatStep {
+export interface Question {
 	name: string;
-	datatype?: StepDatatype;
-	options?: StepOptions;
-	questionMsgTemplate: string;
-	warningMsgTemplate: string;
+	datatype?: QuestionDatatype;
+	options?: QuestionOptions;
+	msgTemplate: string;
+	errTemplate: string;
 }
 
 export interface Chat {
 	name: string;
-	sequence: Array<ChatStep>;
+	sequence: Array<Question>;
 }
 
 export interface ChatDocument extends Document<unknown, any, Chat>, Chat {}
 
-const stepSchema = new Schema<ChatStep>({
+const stepSchema = new Schema<Question>({
 	name: {
 		type: String,
 		required: true,
@@ -30,14 +30,14 @@ const stepSchema = new Schema<ChatStep>({
 	options: {
 		type: [String],
 		required: function () {
-			return (this as ChatStep).datatype === "option";
+			return (this as Question).datatype === "option";
 		},
 	},
-	questionMsgTemplate: {
+	msgTemplate: {
 		type: String,
 		required: true,
 	},
-	warningMsgTemplate: {
+	errTemplate: {
 		type: String,
 		required: true,
 	},

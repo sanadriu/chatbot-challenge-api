@@ -43,8 +43,6 @@ export class ChatController {
 		res: Response,
 		next: NextFunction
 	): Promise<Response | void> => {
-		console.log("on Subscribe");
-
 		try {
 			const { phone } = req.query;
 			const { id } = req.params;
@@ -53,17 +51,22 @@ export class ChatController {
 
 			const connection = setInterval(async () => {
 				const result = await this.chatService.handleServerReply(id, phone);
+				const { success, message, httpStatus, data } = result;
 
-				if (!result.success) throw new HttpException(result.httpStatusCode);
+				res.status(httpStatus).write(`data: ${JSON.stringify({ success, message, data })}\n\n`);
 
-				res.status(200).write(`data: ${JSON.stringify(result.data)}\n\n`);
+				if (!success) clearInterval(connection);
 			}, config.pollingTime);
 
 			req.on("close", () => {
 				clearInterval(connection);
 			});
 		} catch (error) {
-			next(error);
+			if (error instanceof HttpException) {
+				next(error);
+			} else {
+				next(new HttpException());
+			}
 		}
 	};
 
@@ -73,20 +76,25 @@ export class ChatController {
 		next: NextFunction
 	): Promise<Response | void> => {
 		try {
-			const { phone, message } = req.body;
+			const { phone, content } = req.body;
 			const { id } = req.params;
 
-			const result = await this.chatService.handleClientReply(id, phone, message);
+			const result = await this.chatService.handleClientReply(id, phone, content);
+			const { success, message, httpStatus } = result;
+			console.log(result);
 
-			if (result.success) throw new HttpException(result.httpStatusCode, result.message);
+			if (!success) throw new HttpException(httpStatus, message);
 
 			res.status(201).send({
-				success: true,
-				message: result.message,
-				data: result.data,
+				success,
+				message,
 			});
 		} catch (error) {
-			next(error);
+			if (error instanceof HttpException) {
+				next(error);
+			} else {
+				next(new HttpException());
+			}
 		}
 	};
 }

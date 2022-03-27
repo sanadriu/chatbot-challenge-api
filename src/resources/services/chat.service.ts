@@ -1,72 +1,98 @@
 import { IChatService } from "@/utils/interfaces/services/chat.service";
-import { serviceStatusList, ServiceStatus, errorServiceStatus } from "@/utils/status";
+import { ChatResults } from "@/resources/services/chat.results";
 import { ChatRepository } from "../repositories/chat.repository";
+import { ServiceException } from "@/utils/exceptions/service.exception";
+import { ServiceResult } from "@/utils/interfaces/ServiceResult";
 
 export class ChatService implements IChatService {
-	constructor(private chatRepository: ChatRepository) {}
+	constructor(private repository: ChatRepository, private results: ChatResults) {}
 
-	public async subscribe(id: string, phone: string): Promise<ServiceStatus> {
+	public async subscribe(id: string, phone: string): Promise<ServiceResult> {
 		try {
-			const chat = await this.chatRepository.getChatById(id);
+			const chat = await this.repository.getChatById(id);
 
-			if (chat === null) return serviceStatusList.chat.notFound();
+			if (chat === null) return this.results.chatNotFound();
 
-			const client = await this.chatRepository.getClient(phone, id);
+			const client = await this.repository.getClient(phone, id);
 
-			if (client !== null) return serviceStatusList.client.exists();
+			if (client === null) await this.repository.createClient(phone, id);
 
-			await this.chatRepository.createClient(phone, id);
-
-			return serviceStatusList.client.created();
+			return this.results.clientSubscribed();
 		} catch (error) {
-			return errorServiceStatus(error as Error);
+			return new ServiceException();
 		}
 	}
 
-	public async handleServerReply(id: string, phone: string): Promise<ServiceStatus> {
+	public async handleServerReply(id: string, phone: string): Promise<ServiceResult> {
 		try {
-			const chat = await this.chatRepository.getChatById(id);
+			const chat = await this.repository.getChatById(id);
 
-			if (chat === null) return serviceStatusList.chat.notFound();
+			if (chat === null) return this.results.chatNotFound();
 
-			const client = await this.chatRepository.getClient(phone, id);
+			const client = await this.repository.getClient(phone, id);
 
-			if (client === null) return serviceStatusList.client.notFound();
+			if (client === null) return this.results.clientNotFound();
 
-			const chatStep = this.chatRepository.getCurrentChatStep(client, chat);
-			const value = this.chatRepository.getLastClientReply(client);
-			const isValid = this.chatRepository.validateClientReply(value, chatStep.datatype, chatStep.options);
-			const reply = this.chatRepository.getServerReply(chatStep, client, isValid);
+			if (client.isPending) return this.results.noChatbotReply("Chatbot is pending of getting a reply...");
+			if (client.isCompleted) return this.results.noChatbotReply("Client has already fulfilled the chatbot requests.");
 
-			if (isValid) {
-				await this.chatRepository.incrementClientStep(client);
+			let clientReply = this.repository.getLastClientReply(client);
+			let chatbotReply: string;
+
+			if (clientReply?.isValid || clientReply === null) {
+				const question = this.repository.getCurrentQuestion(client, chat);
+				const isCompleted = this.repository.hasBeenCompleted(client, chat);
+
+				if (isCompleted) {
+					chatbotReply = "Thanks to answer all of our questions! We will get you know anything.";
+
+					this.repository.setClientCompleted(client, true);
+				} else {
+					chatbotReply = this.repository.getChatbotReplyMsg(question, client);
+
+					this.repository.setClientPending(client, true);
+				}
 			} else {
-				await this.chatRepository.deleteLastClientReply(client);
+				const question = this.repository.getPreviousQuestion(client, chat)!;
+
+				chatbotReply = this.repository.getChatbotReplyErr(question, client);
+
+				this.repository.deleteLastClientReply(client);
+				this.repository.setClientPending(client, true);
 			}
 
-			return serviceStatusList.chat.getReply(reply);
+			await this.repository.saveClient(client);
+
+			return this.results.getChatbotReply(chatbotReply);
 		} catch (error) {
-			return errorServiceStatus(error as Error);
+			return new ServiceException();
 		}
 	}
 
-	public async handleClientReply(id: string, phone: string, value: string): Promise<ServiceStatus> {
+	public async handleClientReply(id: string, phone: string, value: string): Promise<ServiceResult> {
 		try {
-			const chat = await this.chatRepository.getChatById(id);
+			const chat = await this.repository.getChatById(id);
 
-			if (chat === null) return serviceStatusList.chat.notFound();
+			if (chat === null) return this.results.chatNotFound();
 
-			const client = await this.chatRepository.getClient(phone, id);
+			const client = await this.repository.getClient(phone, id);
 
-			if (client === null) return serviceStatusList.client.notFound();
+			if (client === null) return this.results.clientNotFound();
 
-			const { name } = this.chatRepository.getCurrentChatStep(client, chat);
+			if (!client.isPending || client.isCompleted) return this.results.ignoredClientReply();
 
-			await this.chatRepository.createClientReply(client, name, value);
+			const { name, datatype, options } = this.repository.getCurrentQuestion(client, chat);
 
-			return serviceStatusList.client.createdReply();
+			const isValid = this.repository.validateClientReply(value, datatype, options);
+
+			this.repository.createClientReply(client, name, value, isValid);
+			this.repository.setClientPending(client, false);
+
+			await this.repository.saveClient(client);
+
+			return this.results.createdClientReply();
 		} catch (error) {
-			return errorServiceStatus(error as Error);
+			return new ServiceException();
 		}
 	}
 }
