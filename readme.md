@@ -93,7 +93,7 @@ In the **chats** collection we will manually create the next sample chat configu
 
 The **ObjectID** of this chat will be used later when we had to make requests to the API.
 
-In order to run the API in development mode, you will have to run `npm run dev`. It has been developed a [web client](https://github.com/sanadriu/chatbot-challenge-api) with react to interact with the API in an simpler way.
+In order to run the API in development mode, you will have to run `npm run dev`. It has been developed a [web client](https://github.com/sanadriu/chatbot-challenge-react-demo) with react to interact with the API in an simpler way.
 
 <img src="https://raw.githubusercontent.com/sanadriu/chatbot-challenge-api/main/samples/sample-demo-03.PNG" alt="access form"/>
 <img src="https://raw.githubusercontent.com/sanadriu/chatbot-challenge-api/main/samples/sample-demo-01.PNG" alt="chat part 1"/>
