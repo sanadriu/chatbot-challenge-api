@@ -15,6 +15,6 @@ const chatController = new ChatController(chatService);
 
 const db = new DatabaseService();
 
-const app = new App([chatController], Number(config.port), db);
+const app = new App(config.port, [chatController], db);
 
 app.listen();

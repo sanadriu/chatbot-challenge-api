@@ -81,7 +81,6 @@ export class ChatController {
 
 			const result = await this.chatService.handleClientReply(id, phone, content);
 			const { success, message, httpStatus } = result;
-			console.log(result);
 
 			if (!success) throw new HttpException(httpStatus, message);
 

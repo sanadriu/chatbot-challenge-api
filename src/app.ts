@@ -9,7 +9,7 @@ import { ErrorMiddleware } from "./middlewares/error.middleware";
 export class App {
 	private server: Application;
 
-	constructor(private controllers: IController[], private port: number, private databaseService: IDatabaseService) {
+	constructor(private port: number, private controllers: IController[], private databaseService: IDatabaseService) {
 		this.server = express();
 
 		this.initializeMiddlewares();
