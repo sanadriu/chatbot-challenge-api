@@ -4,13 +4,10 @@ This API is a chatbot that asks the user various types of questions defined by t
 
 ## What has been used?
 
----
-
 The main requirements of this project were the use of **Express.js** and **Typescript**. For data persistance it has been used **MongoDB** and **Mongoose**, and for request validation it has been used **Yup**.
 
 ## How has the code been structured?
 
----
 
 In this project it has been created OOP to create classes for _controllers_, _services_, _repositories_ and _models_. Interfaces has been used to allow that some classes do not depend directly on some other classes, but they rely on the interfaces that are implemented.
 
@@ -32,8 +29,6 @@ There have been used 3 middlewares:
 
 ## Environment preparation
 
----
-
 Once you have cloned the repository, you will have to download all the dependencies by running `npm install`
 
 In order to run this application, is required to have a MongoDB server and create a database that will store data for the collections of _Client_ and _Chat_. The API uses the mongo _URI_ to achieve the connection, so that you will have to specify it in the **.env** file.
@@ -47,6 +42,8 @@ MONGO_PATH_DEV=localhost:27017/chatbot
 ```
 
 In MongoDB, we will create the **chatbot** database, with a collection named **chats**.
+
+<img src="https://raw.githubusercontent.com/sanadriu/chatbot-challenge-api/main/samples/sample-01.PNG" alt="create database"/>
 
 In the **chats** collection we will manually create the next sample chat configuration:
 
@@ -80,6 +77,12 @@ In the **chats** collection we will manually create the next sample chat configu
 
 ```
 
+<img src="https://raw.githubusercontent.com/sanadriu/chatbot-challenge-api/main/samples/sample-02.PNG" alt="create chat config"/>
+
 The **ObjectID** of this chat will be used later when we had to make requests to the API.
 
-In order to run the API in development mode, you will have to run `npm run dev`
+In order to run the API in development mode, you will have to run `npm run dev`. It has been developed a [web client](https://github.com/sanadriu/chatbot-challenge-api) with react to interact with the API in an simpler way.
+
+<img src="https://raw.githubusercontent.com/sanadriu/chatbot-challenge-api/main/samples/sample-demo-03.PNG" alt="access form"/>
+<img src="https://raw.githubusercontent.com/sanadriu/chatbot-challenge-api/main/samples/sample-demo-01.PNG" alt="chat part 1"/>
+<img src="https://raw.githubusercontent.com/sanadriu/chatbot-challenge-api/main/samples/sample-demo-02.PNG" alt="chat part 2"/>
