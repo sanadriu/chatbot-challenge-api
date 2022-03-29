@@ -27,6 +27,18 @@ There have been used 3 middlewares:
 
 - **Validation middleware**: It's a middleware factory that receives a _Yup_ schema to validate it against the _body_, _query_ or _params_ of the request. If the validation in this middleware fails, a _Bad Request_ error is thrown.
 
+## Client and server replies flow
+
+The follow diagrams represent the logic followed to handle the replies that send by both parties to each other.
+
+### Client reply handling
+
+<img src="https://raw.githubusercontent.com/sanadriu/chatbot-challenge-api/main/samples/clientReplyFlow.drawio.png" alt="client reply"/>
+
+### Server reply handling
+
+<img src="https://raw.githubusercontent.com/sanadriu/chatbot-challenge-api/main/samples/serverReplyFlow.drawio.png" alt="server reply"/>
+
 ## Environment preparation
 
 Once you have cloned the repository, you will have to download all the dependencies by running `npm install`
