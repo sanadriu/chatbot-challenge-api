@@ -11,7 +11,7 @@ import {
 	chatReplyBodySchema,
 	ChatSubscribeQuery,
 	chatSubscribeQuerySchema,
-} from "../schemas/chat.schema";
+} from "../validation/chat.schema";
 
 export class ChatController {
 	public router = Router();

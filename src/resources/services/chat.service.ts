@@ -1,11 +1,11 @@
 import { IChatService } from "@/utils/interfaces/services/chat.service";
 import { ChatResults } from "@/resources/services/chat.results";
-import { ChatRepository } from "../repositories/chat.repository";
 import { ServiceException } from "@/utils/exceptions/service.exception";
 import { ServiceResult } from "@/utils/interfaces/ServiceResult";
+import { IChatRepository } from "@/utils/interfaces/repositories/chat.repository";
 
 export class ChatService implements IChatService {
-	constructor(private repository: ChatRepository, private results: ChatResults) {}
+	constructor(private repository: IChatRepository, private results: ChatResults) {}
 
 	public async subscribe(id: string, phone: string): Promise<ServiceResult> {
 		try {
@@ -41,7 +41,7 @@ export class ChatService implements IChatService {
 
 			if (clientReply?.isValid || clientReply === null) {
 				const question = this.repository.getCurrentQuestion(client, chat);
-				const isCompleted = this.repository.hasBeenCompleted(client, chat);
+				const isCompleted = this.repository.isChatCompleted(client, chat);
 
 				if (isCompleted) {
 					chatbotReply = "Thanks to answer all of our questions! We will get you know anything.";
@@ -85,7 +85,7 @@ export class ChatService implements IChatService {
 
 			const isValid = this.repository.validateClientReply(value, datatype, options);
 
-			this.repository.createClientReply(client, name, value, isValid);
+			this.repository.createLastClientReply(client, name, value, isValid);
 			this.repository.setClientPending(client, false);
 
 			await this.repository.saveClient(client);

@@ -2,18 +2,11 @@ import { Chat, ChatDocument, ChatModel, Question, QuestionDatatype, QuestionOpti
 import { Client, ClientData, ClientDocument, ClientModel } from "../models/client.model";
 import { fillTemplate } from "@/helpers/fillTemplate";
 import validator from "validator";
+import { IChatRepository } from "@/utils/interfaces/repositories/chat.repository";
 
-export class ChatRepository {
+export class ChatRepository implements IChatRepository {
 	private chatModel = ChatModel;
 	private clientModel = ClientModel;
-
-	public saveClient(client: ClientDocument): Promise<ClientDocument> {
-		return client.save({ validateBeforeSave: true, validateModifiedOnly: true });
-	}
-
-	public createClient(phone: string, chatId: string): Promise<ClientDocument> {
-		return this.clientModel.create({ phone, chat: chatId });
-	}
 
 	public getChatById(id: string): Promise<ChatDocument | null> {
 		return this.chatModel.findById(id).exec();
@@ -23,13 +16,21 @@ export class ChatRepository {
 		return this.clientModel.findOne({ phone, chat: chatId }).exec();
 	}
 
+	public saveClient(client: ClientDocument): Promise<ClientDocument> {
+		return client.save({ validateBeforeSave: true, validateModifiedOnly: true });
+	}
+
+	public createClient(phone: string, chatId: string): Promise<ClientDocument> {
+		return this.clientModel.create({ phone, chat: chatId });
+	}
+
 	public getLastClientReply(client: Client): ClientData | null {
 		const index = client.datalist.length - 1;
 
 		return index < 0 ? null : client.datalist[index];
 	}
 
-	public createClientReply(client: Client, name: string, value: string, isValid: boolean): void {
+	public createLastClientReply(client: Client, name: string, value: string, isValid: boolean): void {
 		client.datalist.push({ name, value, isValid });
 	}
 
@@ -45,7 +46,7 @@ export class ChatRepository {
 		client.isCompleted = isCompleted;
 	}
 
-	public hasBeenCompleted(client: Client, chat: Chat) {
+	public isChatCompleted(client: Client, chat: Chat): boolean {
 		return chat.sequence.length === client.datalist.length;
 	}
 
@@ -59,7 +60,7 @@ export class ChatRepository {
 		return index < 0 ? null : chat.sequence[index];
 	}
 
-	public getClientDataObject(client: Client) {
+	public getClientDataObject(client: Client): Record<string, string> {
 		const dataObj: Record<string, string> = {};
 
 		client.datalist.forEach((item: ClientData) => (dataObj[item.name] = item.value));

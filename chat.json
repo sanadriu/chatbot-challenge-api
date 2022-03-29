@@ -16,7 +16,7 @@
 			},
 			{
 				"name": "plan",
-				"datatype": "options",
+				"datatype": "option",
 				"options": ["A", "B", "C"],
 				"msgTemplate": "Nice! What insurance plan are you interested in?\n\nA: Basic health insurance.\nB: Full health insurance.\nC: Full health and dental insurance.\n\nPlease answer A, B or C according to your choice.",
 				"errTemplate": "Sorry, can you please reply A, B or C depending on what insurance plan you wish to purchase? Thanks."
